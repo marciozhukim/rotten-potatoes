@@ -9,6 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
+      - name: Docker Logout
+        run: docker logout
+      
       - name: Docker Login
         uses: docker/login-action@v1
         with:
