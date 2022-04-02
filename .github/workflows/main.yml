@@ -1,0 +1,49 @@
+name: CI-CD-Iniciativa-Kubernetes
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+jobs:
+  meu-CI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Docker Logout
+        run: docker logout
+      
+      - name: Docker Login
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USUARIO }}
+          password: ${{ secrets.DOCKERHUB_PWD }}
+      
+      - name: Docker Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./src
+          file: ./src/Dockerfile
+          push: true
+          tags: |
+            marciozhu/rotten-potatoes:latest
+            marciozhu/rotten-potatoes:${{ github.run_number }}
+            
+  meu-CD:
+    needs: [meu-CI]
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+        
+        - name: Settando K8s Context
+          uses: Azure/k8s-set-context@v2
+          with:
+            method: kubeconfig
+            kubeconfig: ${{ secrets.KUBECONFIG }}
+        
+        - name: Deploy to Kubernetes cluster
+          uses: Azure/k8s-deploy@v3.0
+          with:
+            images: marciozhu/rotten-potatoes:${{ github.run_number }}
+            manifests: |
+              k8s/deployment.yaml
+              
