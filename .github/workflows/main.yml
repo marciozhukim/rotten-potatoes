@@ -4,7 +4,7 @@ on:
     branches: [ main ]
   workflow_dispatch:
 jobs:
-  meu-build:
+  meu-CI:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,3 +28,13 @@ jobs:
             marciozhu/rotten-potatoes:latest
             marciozhu/rotten-potatoes:${{ github.run_number }}
             
+  meu-CD:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+        
+        - name: Settando K8s Context
+          uses: Azure/k8s-set-context@v2
+          with:
+            method: kubeconfig
+            kubeconfig: ${{ secrets.KUBECONFIG }}
