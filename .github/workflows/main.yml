@@ -29,6 +29,7 @@ jobs:
             marciozhu/rotten-potatoes:${{ github.run_number }}
             
   meu-CD:
+    needs: [meu-CI]
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v3
